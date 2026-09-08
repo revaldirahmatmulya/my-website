@@ -30,6 +30,28 @@ foreach ($tmpStoragePaths as $path) {
     }
 }
 
+// Redirect cache paths to writable /tmp
+putenv('APP_PACKAGES_CACHE=/tmp/bootstrap/cache/packages.php');
+$_ENV['APP_PACKAGES_CACHE'] = '/tmp/bootstrap/cache/packages.php';
+$_SERVER['APP_PACKAGES_CACHE'] = '/tmp/bootstrap/cache/packages.php';
+
+putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
+$_ENV['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
+$_SERVER['APP_SERVICES_CACHE'] = '/tmp/bootstrap/cache/services.php';
+
+putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+$_SERVER['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+
+// Copy pre-compiled package and service manifests if present
+foreach (['packages.php', 'services.php'] as $cacheFile) {
+    $src = __DIR__ . '/../bootstrap/cache/' . $cacheFile;
+    $dst = '/tmp/bootstrap/cache/' . $cacheFile;
+    if (file_exists($src) && !file_exists($dst)) {
+        @copy($src, $dst);
+    }
+}
+
 // Default SQLite fallback in /tmp if not using external database
 $dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? 'sqlite');
 $needsSqliteInit = false;
