@@ -114,6 +114,17 @@ try {
         }
     }
 
+    // Auto-seed MongoDB Atlas if connected and projects collection is empty
+    if ($dbConnection === 'mongodb' && extension_loaded('mongodb')) {
+        try {
+            if (\App\Models\Project::count() === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            }
+        } catch (\Throwable $mongoSeedError) {
+            error_log('Auto MongoDB initialization: ' . $mongoSeedError->getMessage());
+        }
+    }
+
     $request = \Illuminate\Http\Request::capture();
     $response = $app->handleRequest($request);
     $response->send();
