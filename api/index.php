@@ -139,31 +139,31 @@ try {
         }
     }
 
-    $request = \Illuminate\Http\Request::capture();
-    $response = $app->handleRequest($request);
-    $response->send();
-    $app->terminate();
+    $app->handleRequest(\Illuminate\Http\Request::capture());
 } catch (\Throwable $e) {
     error_log('Vercel Laravel Bootstrap Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
-    $isDebug = (getenv('APP_DEBUG') === 'true') || isset($_GET['debug']);
+    if (!headers_sent()) {
+        $isDebug = (getenv('APP_DEBUG') === 'true') || isset($_GET['debug']);
 
-    http_response_code(500);
-    header('Content-Type: text/html; charset=utf-8');
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
 
-    if ($isDebug) {
-        echo "<div style=\"font-family:sans-serif;padding:30px;background:#fef2f2;color:#991b1b;border:1px solid #f87171;margin:20px;border-radius:8px;\">";
-        echo "<h2>Vercel Diagnostic Error</h2>";
-        echo "<p><strong>Exception:</strong> " . get_class($e) . "</p>";
-        echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-        echo "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "</p>";
-        echo "<h3>Stack Trace:</h3>";
-        echo "<pre style=\"background:#fff;padding:15px;overflow:auto;font-size:12px;\">" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
-        echo "</div>";
-    } else {
-        echo "<div style=\"font-family:sans-serif;text-align:center;padding:50px;\">";
-        echo "<h1>500 | Server Error</h1>";
-        echo "<p>Something went wrong on the server. If you are the owner, add <code>?debug=1</code> to the URL to view diagnostic details.</p>";
-        echo "</div>";
+        if ($isDebug) {
+            echo "<div style=\"font-family:sans-serif;padding:30px;background:#fef2f2;color:#991b1b;border:1px solid #f87171;margin:20px;border-radius:8px;\">";
+            echo "<h2>Vercel Diagnostic Error</h2>";
+            echo "<p><strong>Exception:</strong> " . get_class($e) . "</p>";
+            echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+            echo "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "</p>";
+            echo "<h3>Stack Trace:</h3>";
+            echo "<pre style=\"background:#fff;padding:15px;overflow:auto;font-size:12px;\">" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+            echo "</div>";
+        } else {
+            echo "<div style=\"font-family:sans-serif;text-align:center;padding:50px;\">";
+            echo "<h1>500 | Server Error</h1>";
+            echo "<p>Something went wrong on the server. If you are the owner, add <code>?debug=1</code> to the URL to view diagnostic details.</p>";
+            echo "</div>";
+        }
     }
 }
+
