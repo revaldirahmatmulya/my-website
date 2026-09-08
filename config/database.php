@@ -36,6 +36,11 @@ return [
             'driver' => 'mongodb',
             'dsn' => env('MONGODB_URI', 'mongodb://127.0.0.1:27017'),
             'database' => env('MONGODB_DATABASE', 'portfolio'),
+            'options' => array_filter([
+                'tlsAllowInvalidCertificates' => env('MONGODB_ALLOW_INVALID_CERTS') !== null
+                    ? filter_var(env('MONGODB_ALLOW_INVALID_CERTS'), FILTER_VALIDATE_BOOLEAN)
+                    : null,
+            ], fn ($value) => $value !== null),
         ],
 
         'sqlite' => [
