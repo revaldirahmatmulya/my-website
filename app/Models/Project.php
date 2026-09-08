@@ -2,16 +2,23 @@
 
 namespace App\Models;
 
-use Database\Factories\ProjectFactory;
+use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Project extends Model
+class Project extends BaseModel
 {
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;
+
+    /**
+     * The table or MongoDB collection associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'projects';
+    protected $collection = 'projects';
 
     /**
      * The attributes that are mass assignable.
