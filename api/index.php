@@ -15,6 +15,20 @@ if (empty(getenv('APP_KEY')) && empty($_ENV['APP_KEY'])) {
     $_SERVER['APP_KEY'] = $fallbackKey;
 }
 
+// Fallback session driver to cookie for serverless if not set
+if (empty(getenv('SESSION_DRIVER')) && empty($_ENV['SESSION_DRIVER'])) {
+    putenv('SESSION_DRIVER=cookie');
+    $_ENV['SESSION_DRIVER'] = 'cookie';
+    $_SERVER['SESSION_DRIVER'] = 'cookie';
+}
+
+// Fallback cache store to array for serverless if not set
+if (empty(getenv('CACHE_STORE')) && empty($_ENV['CACHE_STORE'])) {
+    putenv('CACHE_STORE=array');
+    $_ENV['CACHE_STORE'] = 'array';
+    $_SERVER['CACHE_STORE'] = 'array';
+}
+
 // Serverless /tmp writable directories setup
 $tmpStoragePaths = [
     '/tmp/storage/framework/views',
