@@ -12,9 +12,14 @@ class PortfolioController extends Controller
      */
     public function index(): View
     {
-        $projects = Project::query()
-            ->ordered()
-            ->get();
+        try {
+            $projects = Project::query()
+                ->ordered()
+                ->get();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Portfolio database query failed: ' . $e->getMessage());
+            $projects = collect();
+        }
 
         $profile = config('portfolio');
 
