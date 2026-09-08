@@ -43,13 +43,39 @@ putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 $_SERVER['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 
-// Copy pre-compiled package and service manifests if present
-foreach (['packages.php', 'services.php'] as $cacheFile) {
-    $src = __DIR__ . '/../bootstrap/cache/' . $cacheFile;
-    $dst = '/tmp/bootstrap/cache/' . $cacheFile;
-    if (file_exists($src) && !file_exists($dst)) {
-        @copy($src, $dst);
+// Load composer autoloader early
+require __DIR__ . '/../vendor/autoload.php';
+
+// Dynamically filter package manifest to only include providers that exist in this vendor
+$packages = [];
+$packagesFile = __DIR__ . '/../bootstrap/cache/packages.php';
+
+if (file_exists($packagesFile)) {
+    $rawPackages = require $packagesFile;
+    if (is_array($rawPackages)) {
+        foreach ($rawPackages as $pkgName => $pkgConfig) {
+            if (isset($pkgConfig['providers'])) {
+                $validProviders = array_values(array_filter(
+                    $pkgConfig['providers'],
+                    fn ($cls) => class_exists($cls)
+                ));
+                if (!empty($validProviders)) {
+                    $pkgConfig['providers'] = $validProviders;
+                    $packages[$pkgName] = $pkgConfig;
+                }
+            }
+        }
     }
+}
+
+file_put_contents(
+    '/tmp/bootstrap/cache/packages.php',
+    '<?php return ' . var_export($packages, true) . ';'
+);
+
+// Ensure services.php is freshly compiled by ProviderRepository in writable /tmp
+if (file_exists('/tmp/bootstrap/cache/services.php')) {
+    @unlink('/tmp/bootstrap/cache/services.php');
 }
 
 // Default SQLite fallback in /tmp if not using external database
@@ -76,7 +102,6 @@ if ($dbConnection === 'sqlite') {
 try {
     define('LARAVEL_START', microtime(true));
 
-    require __DIR__ . '/../vendor/autoload.php';
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
     // Auto-migrate & seed SQLite on cold start if fresh
