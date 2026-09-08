@@ -72,14 +72,6 @@
                 </button>
             </form>
 
-            <!-- Default Credentials Tip -->
-            <div class="mt-6 pt-5 border-t border-slate-800/80 text-center">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs text-slate-400">
-                    <span class="font-semibold text-indigo-400">Default:</span>
-                    <code>admin@example.com</code> / <code>password</code>
-                </div>
-            </div>
-
             <!-- Back link -->
             <div class="mt-6 text-center">
                 <a href="{{ route('home') }}" class="text-xs text-slate-500 hover:text-slate-300 transition-colors inline-flex items-center gap-1">

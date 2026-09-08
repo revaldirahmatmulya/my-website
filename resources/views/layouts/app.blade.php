@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('portfolio.name', 'Aldi') . ' — ' . config('portfolio.role', 'Web Developer'))</title>
+    <title>@yield('title', 'Revaldi\'s Portfolio')</title>
     <meta name="description" content="@yield('meta_description', config('portfolio.bio'))">
 
     <!-- Favicon -->
